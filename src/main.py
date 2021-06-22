@@ -286,11 +286,11 @@ class Rozenbrok:
 
 # === Tests ===
 def test_starts():
-    d_swen = 0.1
+    d_swen = 0.01
     way_search = "golden_ratio"
     golden_eps = 0.01
     n = 3
-    radius = 0.1
+    radius = 1e-05
     eps = 0.001
     print("==== Testing how function calculation varies depending on starting point ====")
     print(
@@ -325,7 +325,7 @@ def test_starts():
         count = float_to_exp(f.counter)
         times.append(f.counter)
         results.append(minimum)
-        print(f"{minimum=} with {count}")
+        print(f"min = {float_to_exp(minimum)} with {count}")
     print("==== Results =====")
     min_res = float_to_exp(min(results))
     max_res = float_to_exp(max(results))
@@ -345,10 +345,10 @@ def test_starts():
 
 def test_golden_epsilon():
     start = point(50, 50)
-    d_swen = 0.1
+    d_swen = 0.01
     way_search = "golden_ratio"
     n = 3
-    radius = 0.1
+    radius = 1e-05
     eps = 0.001
     print("")
     print("== Testing how function calculation varies depending on `e` in golden_ratio ==")
@@ -404,5 +404,133 @@ def test_golden_epsilon():
     )
 
 
+def test_swen_precision():
+    start = point(50, 50)
+    way_search = "golden_ratio"
+    golden_eps = 0.01
+    n = 3
+    radius = 1e-05
+    eps = 0.001
+    print("")
+    print(
+        "== "
+        "Testing how function calculation varies depending on "
+        "`d` in swen_algorithm =="
+    )
+    print(
+        f"{start=}\n"
+        f"{golden_eps=}\n"
+        f"{way_search=}\n"
+        f"{n=}\n"
+        f"{radius=}\n"
+        f"{eps=}\n"
+    )
+    ds = [0.05, 0.01, 0.001, 0.0001]
+    tests = len(ds)
+    for d_swen in ds:
+        print(
+            f"Using {d_swen=}"
+        )
+        results = []
+        times = []
+        for _ in range(5):
+            f = Rozenbrok()
+            extremum = minimize_with_random_search(
+                f,
+                start,
+                way_search=way_search,
+                d_swen=d_swen,
+                golden_eps=golden_eps,
+                n=n,
+                radius=radius,
+                eps=eps,
+            )
+
+            minimum = f(extremum)
+            times.append(f.counter)
+            results.append(minimum)
+        print("==== Results =====")
+        min_res = float_to_exp(min(results))
+        max_res = float_to_exp(max(results))
+        avg_res = float_to_exp(sum(results) / tests)
+        print(
+            f"Function results.     min: {min_res}, avg: {avg_res}, max: {max_res}")
+        min_time = float_to_exp(min(times))
+        max_time = float_to_exp(max(times))
+        avg_time = float_to_exp(sum(times) / tests)
+        print(
+            f"Function calculation. min: {min_time}, avg: {avg_time}, max: {max_time}")
+    print(
+        ">\n"
+        "Using lesser `d` for step calculation in swen interval "
+        "improves both speed and precision of method\n"
+        "But as in case with precision of golden_ratio it produces false-positives "
+        "when `d` is lesser than `eps` for random search method"
+    )
+
+def test_radius():
+    start = point(50, 50)
+    d_swen = 0.01
+    way_search = "golden_ratio"
+    golden_eps = 0.01
+    n = 5
+    eps = 0.001
+    print("")
+    print(
+        "== "
+        "Testing how function calculation varies depending on "
+        "`radius` of random search =="
+    )
+    print(
+        f"{d_swen=}\n"
+        f"{start=}\n"
+        f"{golden_eps=}\n"
+        f"{way_search=}\n"
+        f"{n=}\n"
+        f"{eps=}\n"
+    )
+    rs = [1.0, 0.5, 0.2, 0.1, 0.01, 0.001, 0.000_01, 0.000_000_1]
+    tests = len(rs)
+    for radius in rs:
+        print(
+            f"Using {radius=}"
+        )
+        results = []
+        times = []
+        for _ in range(10):
+            f = Rozenbrok()
+            extremum = minimize_with_random_search(
+                f,
+                start,
+                way_search=way_search,
+                d_swen=d_swen,
+                golden_eps=golden_eps,
+                n=n,
+                radius=radius,
+                eps=eps,
+            )
+
+            minimum = f(extremum)
+            times.append(f.counter)
+            results.append(minimum)
+        print("==== Results =====")
+        min_res = float_to_exp(min(results))
+        max_res = float_to_exp(max(results))
+        avg_res = float_to_exp(sum(results) / tests)
+        print(
+            f"Function results.     min: {min_res}, avg: {avg_res}, max: {max_res}")
+        min_time = float_to_exp(min(times))
+        max_time = float_to_exp(max(times))
+        avg_time = float_to_exp(sum(times) / tests)
+        print(
+            f"Function calculation. min: {min_time}, avg: {avg_time}, max: {max_time}")
+    print(
+        ">\n"
+        "Lesser radius produces both better speeds and precision, but after some point "
+        " it's getting to worse values"
+    )
+
 test_starts()
 test_golden_epsilon()
+test_swen_precision()
+test_radius()
