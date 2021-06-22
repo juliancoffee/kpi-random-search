@@ -13,18 +13,23 @@ Function = Callable[['Vec2'], float]
 
 
 def trace(f):
+    VERBOSE = False
+    DEBUG = False
     def wrapper(*args, **kwargs):
         res = f(*args, **kwargs)
-        if len(kwargs) == 0:
-            keywords = ""
+        if not DEBUG:
+            return res
         else:
-            keywords = str(kwargs)
-        params = ', '.join(map(str, args))
-        params = ""
-        print(
-            f"{f.__name__}({params}, {keywords}) =\n {res}"
-        )
-        return res
+            if VERBOSE:
+                params = ', '.join(map(str, args))
+                keywords = "" if len(kwargs) == 0 else str(kwargs)
+                print(
+                    f"{f.__name__}({params}, {keywords}) =\n {res}"
+                )
+            else:
+                print(f"{f.__name__}() = {res}")
+
+            return res
     return wrapper
 
 
@@ -116,7 +121,6 @@ def choose_direction(f: Function, x0: Vec2, s: Vec2, d: float) -> Optional[float
     elif left < exact and exact < right:
         return -1.0
     else:  # if left == right
-        DEBUG(f"{(left, right)=}")
         return None
 
 
@@ -269,17 +273,17 @@ class Rozenbrok:
 f = Rozenbrok()
 extremum = minimize_with_random_search(
     f,
-    point(10.5, 10.5),
+    point(0.0, 0.0),
     way_search="golden_ratio",
     d_swen=0.1,
-    golden_eps=0.1,
-    n=5,
+    golden_eps=0.01,
+    n=3,
     radius=0.1,
     eps=0.001,
 )
 
 minimum = f(extremum)
-times = f.counter
+log10_times = math.log(f.counter, 10)
 print(f"{extremum=}\n"
       f"{minimum=}\n"
-      f"{times=}")
+      f"{log10_times=}")
