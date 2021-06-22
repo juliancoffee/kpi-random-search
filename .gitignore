@@ -1,0 +1,4 @@
+tmp/
+venv/
+.vim/
+**/.mypy_cache/
