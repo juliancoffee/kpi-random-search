@@ -452,12 +452,13 @@ def test_starts():
         f"{radius=}\n"
         f"{eps=}\n"
     )
-    tests = 10
+    tests = 20
     results = []
     times = []
     for i in range(tests):
         f = Rozenbrok()
-        start = point(1.0, 1.0) * (10 * i + eps)
+        # add epsilon to avoid zero division
+        start = point(1.0, 1.0) * (10 * (i - 10) + eps)
         print(
             f"Starting at {start}"
         )
@@ -718,7 +719,7 @@ def test_epsilon():
         f"{radius=}\n"
         f"{n=}\n"
     )
-    epsilons = [0.000_1, 1e-06, 1e-09, 1e-15]
+    epsilons = [0.000_1, 1e-06, 1e-09, 1e-12]
     for eps in epsilons:
         print(
             f"Using {eps=}"
@@ -747,7 +748,6 @@ def test_epsilon():
         ">\n"
         "Lesser epsilon gives more precise calculation, but requires more time"
     )
-
 
 test_way_search()
 test_starts()
