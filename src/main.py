@@ -1,4 +1,4 @@
-from typing import Tuple, Optional, NoReturn, Sequence
+from typing import Tuple, Optional, NoReturn, Sequence, Iterable
 from collections.abc import Callable
 from dataclasses import dataclass
 import math
@@ -45,14 +45,16 @@ def debug(*args, **kwargs) -> None:
     print(*args, **kwargs)
 
 
-def avg(iterable: Sequence[float]) -> float:
+def avg(iterable):
     """Returns mean of sequence of `-inf` if empty"""
     if len(iterable) == 0:
         return float("-inf")
-    return sum(iterable) / len(iterable)
+    sum_all = sum(iterable)
+    n = len(iterable)
+    return sum_all / n
 
 
-def moda(xs: list[float]) -> float:
+def moda(xs):
     """Returns average value with removing anomaly big values"""
     data = [min(xs)]
     values = sorted(xs)[1:]
@@ -62,7 +64,11 @@ def moda(xs: list[float]) -> float:
     return avg(data)
 
 
-def show_results(results: list[float], times: list[int]):
+def show_results(
+        results: list[float],
+        times: list[int],
+        extremums: Optional[list['Vec2']] = None,
+) -> None:
     print("==== Results =====")
     min_res = min(results)
     max_res = max(results)
@@ -71,6 +77,13 @@ def show_results(results: list[float], times: list[int]):
     print(
         f"Function results.\n"
         f"min: {min_res:.2e}, moda: {moda_res:.2e}, avg: {avg_res:.2e}, max: {max_res:.2e}")
+    if extremums is not None:
+        min_extr = min(extremums)
+        max_extr = max(extremums)
+        print(
+            f"Extremums.\n"
+            f"min: {min_extr}, max: {max_extr}"
+        )
     min_time = min(times)
     max_time = max(times)
     print(
@@ -95,6 +108,9 @@ class Vec2:
         """k * x"""
         x1, x2 = self.pair
         return point(x1 * k, x2 * k)
+
+    def __lt__(self, other: 'Vec2') -> bool:
+        return self.norm() < other.norm()
 
     def __add__(self, other: 'Vec2') -> 'Vec2':
         return self.add(other)
@@ -348,7 +364,54 @@ def minimize_with_random_search(
             fi = fn
     return xi
 
+
+def minimize_with_condition(
+        f: Function,
+        x0: Vec2,
+        condition: Callable,
+        *,
+        d_swen: float = K,
+        dsk_eps: float = DSK_EPSILON,
+        golden_eps: float = GOLDEN_EPSILON,
+        n: int = N,
+        radius: float = RADIUS,
+        eps: float = EPSILON,
+) -> Vec2:
+    """Minimize function `f` with condition
+
+    Uses method of random search with constant step to find minimum
+    Uses method of penalty functions to fit conditions
+    """
+    r = 1.0
+    def px(r): return lambda x: f(x) + r * condition(x) ** 2
+    approx = minimize_with_random_search(
+        px(r),
+        x0,
+        way_search="dsk",
+        d_swen=d_swen,
+        dsk_eps=dsk_eps,
+        n=n,
+        radius=radius,
+        eps=eps
+    )
+    print(f"{r=}, {approx=}")
+    while condition(approx) < -0.01:
+        r *= 10.0
+        approx = minimize_with_random_search(
+            px(r),
+            x0,
+            way_search="dsk",
+            d_swen=d_swen,
+            dsk_eps=dsk_eps,
+            n=n,
+            radius=radius,
+            eps=eps
+        )
+        print(f"{r=}, {approx=}")
+    return approx
+
 # === Experiments ===
+
 
 class Rozenbrok:
     counter: int
@@ -373,6 +436,7 @@ class Rozenbrok:
         # time.sleep(0.05)
 
         return self.calculate(point)
+
 
 def test_way_search():
     # test data
@@ -438,7 +502,6 @@ def test_way_search():
 
 
 def test_starts():
-    input("press any key to continue")
     d_swen = 0.001
     way_search = "dsk"
     dsk_eps = 0.000_1
@@ -488,7 +551,6 @@ def test_starts():
 
 
 def test_golden_epsilon():
-    input("press any key to continue")
     start = point(50, 50)
     d_swen = 0.01
     way_search = "golden_ratio"
@@ -540,7 +602,6 @@ def test_golden_epsilon():
 
 
 def test_swen_precision():
-    input("press any key to continue")
     start = point(50, 50)
     way_search = "dsk"
     dsk_eps = 0.000_1
@@ -595,7 +656,6 @@ def test_swen_precision():
 
 
 def test_radius():
-    input("press any key to continue")
     start = point(50, 50)
     d_swen = 1e-05
     way_search = "dsk"
@@ -648,7 +708,6 @@ def test_radius():
 
 
 def test_tries():
-    input("press any key to continue")
     start = point(50, 50)
     d_swen = 1e-05
     way_search = "dsk"
@@ -701,7 +760,6 @@ def test_tries():
 
 
 def test_epsilon():
-    input("press any key to continue")
     start = point(50, 50)
     d_swen = 1e-05
     way_search = "dsk"
@@ -728,6 +786,7 @@ def test_epsilon():
         )
         results = []
         times = []
+        extremums = []
         tests = 10
         for _ in range(tests):
             f = Rozenbrok()
@@ -745,11 +804,82 @@ def test_epsilon():
             minimum = f(extremum)
             times.append(f.counter)
             results.append(minimum)
-        show_results(results, times)
+            extremums.append(extremum)
+        show_results(results, times, extremums)
     print(
         ">\n"
         "Lesser epsilon gives more precise calculation, but requires more time"
     )
+
+
+def test_conditional():
+    start = point(50, 50)
+    d_swen = 1e-05
+    way_search = "dsk"
+    dsk_eps = 0.000_1
+    n = 10
+    radius = 0.001
+    eps = 1e-9
+    print("Test conditional optimization")
+    print(
+        f"{d_swen=}\n"
+        f"{start=}\n"
+        f"{way_search=}\n"
+        f"{dsk_eps=}\n"
+        f"{radius=}\n"
+        f"{eps=}\n"
+        f"{n=}\n"
+    )
+
+    def condition_with_min_out(point: Vec2) -> float:
+        x1, x2 = point.pair
+        return -1 - x1 - x2
+
+    def condition_with_min_in(point: Vec2) -> float:
+        x1, x2 = point.pair
+        return 2 - x1 - x2
+
+    def condition_convex(point: Vec2) -> float:
+        x1, x2 = point.pair
+        return (x1 - 5) ** 2 - (x2 - 5) ** 2 - 1
+    conditions = [
+        condition_with_min_in,
+        condition_with_min_out,
+        condition_convex,
+    ]
+    for condition in conditions:
+        print(
+            f"Using {condition.__name__=}"
+        )
+        results = []
+        times = []
+        extremums = []
+        tests = 5
+        for _ in range(tests):
+            f = Rozenbrok()
+            extremum = minimize_with_condition(
+                f,
+                start,
+                condition,
+                d_swen=d_swen,
+                dsk_eps=dsk_eps,
+                n=n,
+                radius=radius,
+                eps=eps,
+            )
+
+            minimum = f(extremum)
+            times.append(f.counter)
+            results.append(minimum)
+            extremums.append(extremum)
+        show_results(results, times, extremums)
+    print(
+        ">\n"
+        "Function minimization works faster when local minimum is inside condition area"
+        "Also random search works faster with flex shapes"
+        " rather then with linear restrictions."
+    )
+
 
 test_way_search()
 test_starts()
@@ -758,3 +888,5 @@ test_swen_precision()
 test_radius()
 test_tries()
 test_epsilon()
+test_conditional()
+test_optimal()
