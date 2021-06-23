@@ -6,9 +6,9 @@ import random
 import functools
 
 
-# ======
-# convinience definition
-# ======
+# ====================
+# Convinient definition
+# ====================
 
 Function = Callable[['Vec2'], float]
 
@@ -120,9 +120,9 @@ def point(x1: float, x2: float) -> Vec2:
     return Vec2((x1, x2))
 
 
-# =======
-# constants
-# =======
+# ====================
+# Constants
+# ====================
 X0 = point(0, 0)
 K = 0.1  # swen step coefficient
 STEP_NUM = 1_000  # swen max step number
@@ -133,6 +133,9 @@ RADIUS = 0.1  # radius of random search
 N = 20  # number of random tries in random search
 
 
+# ====================
+# Function definition
+# ====================
 def lstep(xi: Vec2, si: Vec2, k: float) -> float:
     """Returns step for Swen alorithm"""
     return k * xi.norm() / si.norm()
@@ -345,6 +348,7 @@ def minimize_with_random_search(
             fi = fn
     return xi
 
+# === Experiments ===
 
 class Rozenbrok:
     counter: int
@@ -370,8 +374,6 @@ class Rozenbrok:
 
         return self.calculate(point)
 
-
-# === Tests ===
 def test_way_search():
     # test data
     start = point(50, 50)
