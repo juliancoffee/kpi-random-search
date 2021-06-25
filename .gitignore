@@ -1,4 +1,6 @@
 tmp/
 venv/
 .vim/
+.nvimrc
 **/.mypy_cache/
+**/.ipynb_checkpoints

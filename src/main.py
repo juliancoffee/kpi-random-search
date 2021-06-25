@@ -454,10 +454,10 @@ def test_way_search():
         "method for way seach (golden_ratio or dsk_powell) =="
     )
     print(
-        f"{d_swen=}\n"
-        f"{start=}\n"
-        f"{radius=}\n"
-        f"{n=}"
+        f"d_swen={d_swen}\n"
+        f"start={start}\n"
+        f"radius={radius}\n"
+        f"n={n}"
     )
     methods = ["golden_ratio", "dsk"]
     for way_search in methods:
@@ -465,14 +465,14 @@ def test_way_search():
             golden_eps = 0.01
             eps = 0.001
             print(f"\nUsing GoldenRatio\n"
-                  f"{golden_eps=}\n"
-                  f"{eps=}")
+                  f"golden_eps={golden_eps}\n"
+                  f"eps={eps}")
         elif way_search == "dsk":
             eps = 1e-09
             dsk_eps = 0.000_1
             print(f"\nUsing DSK-Powell\n"
-                  f"{dsk_eps=}\n"
-                  f"{eps=}")
+                  f"dsk_eps={dsk_eps}\n"
+                  f"eps={eps}")
         results = []
         times = []
         tests = 10
@@ -510,12 +510,12 @@ def test_starts():
     eps = 1e-09
     print("==== Testing how function calculation varies depending on starting point ====")
     print(
-        f"{d_swen=}\n"
-        f"{way_search=}\n"
-        f"{dsk_eps=}\n"
-        f"{n=}\n"
-        f"{radius=}\n"
-        f"{eps=}\n"
+        f"d_swen={d_swen}\n"
+        f"way_search={way_search}\n"
+        f"dsk_eps={dsk_eps}\n"
+        f"n={n}\n"
+        f"radius={radius}\n"
+        f"eps={eps}\n"
     )
     tests = 20
     results = []
@@ -542,7 +542,7 @@ def test_starts():
         count = f.counter
         times.append(f.counter)
         results.append(minimum)
-        print(f"min = {minimum:.2e} with {count=:.2e}")
+        print(f"min = {minimum:.2e} with function calculated {count} times")
     show_results(results, times)
     print(
         ">\n"
@@ -560,17 +560,17 @@ def test_golden_epsilon():
     print("")
     print("== Testing how function calculation varies depending on `e` in golden_ratio ==")
     print(
-        f"{start=}\n"
-        f"{d_swen=}\n"
-        f"{way_search=}\n"
-        f"{n=}\n"
-        f"{radius=}\n"
-        f"{eps=}\n"
+        f"start={start}\n"
+        f"d_swen={d_swen}\n"
+        f"way_search={way_search}\n"
+        f"n={n}\n"
+        f"radius={radius}\n"
+        f"eps={eps}\n"
     )
     epsilons = [0.2, 0.1, 0.05, 0.02, 0.01, 0.001]
     for golden_eps in epsilons:
         print(
-            f"Using {golden_eps=}"
+            f"Using golden_eps={golden_eps}"
         )
         results = []
         times = []
@@ -614,17 +614,17 @@ def test_swen_precision():
         "`d` in swen_algorithm =="
     )
     print(
-        f"{start=}\n"
-        f"{dsk_eps=}\n"
-        f"{way_search=}\n"
-        f"{n=}\n"
-        f"{radius=}\n"
-        f"{eps=}\n"
+        f"start={start}\n"
+        f"dsk_eps={dsk_eps}\n"
+        f"way_search={way_search}\n"
+        f"n={n}\n"
+        f"radius={radius}\n"
+        f"eps={eps}\n"
     )
     ds = [0.05, 0.01, 0.001, 0.0001, eps * 0.001]
     for d_swen in ds:
         print(
-            f"Using {d_swen=}"
+            f"Using d_swen={d_swen}"
         )
         results = []
         times = []
@@ -669,17 +669,17 @@ def test_radius():
         "`radius` of random search =="
     )
     print(
-        f"{d_swen=}\n"
-        f"{start=}\n"
-        f"{dsk_eps=}\n"
-        f"{way_search=}\n"
-        f"{n=}\n"
-        f"{eps=}\n"
+        f"d_swen={d_swen}\n"
+        f"start={start}\n"
+        f"dsk_eps={dsk_eps}\n"
+        f"way_search={way_search}\n"
+        f"n={n}\n"
+        f"eps={eps}\n"
     )
     rs = [1.0, 0.5, 0.2, 0.1, 0.01, 0.001, 0.000_01, 0.000_000_1]
     for radius in rs:
         print(
-            f"Using {radius=}"
+            f"Using radius={radius}"
         )
         results = []
         times = []
@@ -721,17 +721,17 @@ def test_tries():
         "number of tries in random search =="
     )
     print(
-        f"{d_swen=}\n"
-        f"{start=}\n"
-        f"{way_search=}\n"
-        f"{dsk_eps=}\n"
-        f"{radius=}\n"
-        f"{eps=}\n"
+        f"d_swen={d_swen}\n"
+        f"start={start}\n"
+        f"way_search={way_search}\n"
+        f"dsk_eps={dsk_eps}\n"
+        f"radius={radius}\n"
+        f"eps={eps}\n"
     )
     ns = [3, 5, 7, 8, 9, 10, 12, 15, 20]
     for n in ns:
         print(
-            f"Using {n=}"
+            f"Using n={n}"
         )
         results = []
         times = []
@@ -772,17 +772,17 @@ def test_epsilon():
         "epsilon in random search =="
     )
     print(
-        f"{d_swen=}\n"
-        f"{start=}\n"
-        f"{way_search=}\n"
-        f"{dsk_eps=}\n"
-        f"{radius=}\n"
-        f"{n=}\n"
+        f"d_swen={d_swen}\n"
+        f"start={start}\n"
+        f"way_search={way_search}\n"
+        f"dsk_eps={dsk_eps}\n"
+        f"radius={radius}\n"
+        f"n={n}\n"
     )
     epsilons = [0.000_1, 1e-06, 1e-09, 1e-12]
     for eps in epsilons:
         print(
-            f"Using {eps=}"
+            f"Using eps={eps}"
         )
         results = []
         times = []
@@ -822,13 +822,13 @@ def test_conditional():
     eps = 1e-9
     print("Test conditional optimization")
     print(
-        f"{d_swen=}\n"
-        f"{start=}\n"
-        f"{way_search=}\n"
-        f"{dsk_eps=}\n"
-        f"{radius=}\n"
-        f"{eps=}\n"
-        f"{n=}\n"
+        f"d_swen={d_swen}\n"
+        f"start={start}\n"
+        f"way_search={way_search}\n"
+        f"dsk_eps={dsk_eps}\n"
+        f"radius={radius}\n"
+        f"eps={eps}\n"
+        f"n={n}\n"
     )
 
     def condition_with_min_out(point: Vec2) -> float:
@@ -849,7 +849,7 @@ def test_conditional():
     ]
     for condition in conditions:
         print(
-            f"Using {condition.__name__=}"
+            f"Using condition.__name__={condition.__name__}"
         )
         results = []
         times = []
@@ -889,4 +889,3 @@ test_radius()
 test_tries()
 test_epsilon()
 test_conditional()
-test_optimal()
